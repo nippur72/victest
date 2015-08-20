@@ -14,7 +14,7 @@
 	<script language="JavaScript" src="./vic20.php_files/superfish.js" type="text/javascript"><!-- x --></script>
 	<script language="JavaScript" src="./vic20.php_files/supersubs.js" type="text/javascript"><!-- x --></script>
 </head>
-<body style="padding:0;margin:0">
+<body style="padding:0; margin:0; background: black;">
 
 
 <script language="JavaScript" src="./vic20.php_files/event.js" type="text/javascript"><!-- x --></script>
@@ -33,16 +33,30 @@
 <!--<canvas id="canvas" width="334" height="254" style="display: block; margin-left: auto; margin-right: auto; height: 480px; width: 512px;" onclick="fullscreen(true)">&nbsp;</canvas>-->
 <canvas id="canvas" style="display: block; margin-left: auto; margin-right: auto; height: 1024px; width: 1024px;" onclick="fullscreen(true)">&nbsp;</canvas>
 
-<button style="width: 100px; height: 100px;" onclick="sendkey(81)">Q</button>
-<button style="width: 100px; height: 100px;" onclick="sendkey(87)">W</button>
-<button style="width: 100px; height: 100px;" onclick="sendkey(69)">E</button>
-<button style="width: 100px; height: 100px;" onclick="sendkey(82)">R</button>
-<button style="width: 100px; height: 100px;" onclick="sendkey(84)">T</button>
-<button style="width: 100px; height: 100px;" onclick="sendkey(89)">Y</button>
-<button style="width: 100px; height: 100px;" onclick="sendkey(85)">U</button>
-<button style="width: 100px; height: 100px;" onclick="sendkey(73)">I</button>
-<button style="width: 100px; height: 100px;" onclick="sendkey(79)">O</button>
-<button style="width: 100px; height: 100px;" onclick="sendkey(80)">P</button>
+<style>
+.vickey
+{
+   width: 70px; 
+   height: 110px;
+   margin: 15px;
+   font-size: 25px;
+   font-weight: bolder; 
+   color: white; 
+   background: gray; 	
+}	
+</style>	
+	
+
+<button class="vickey" onclick="sendkey(81)">Q</button>
+<button class="vickey" onclick="sendkey(87)">W</button>
+<button class="vickey" onclick="sendkey(69)">E</button>
+<button class="vickey" onclick="sendkey(82)">R</button>
+<button class="vickey" onclick="sendkey(84)">T</button>
+<button class="vickey" onclick="sendkey(89)">Y</button>
+<button class="vickey" onclick="sendkey(85)">U</button>
+<button class="vickey" onclick="sendkey(73)">I</button>
+<button class="vickey" onclick="sendkey(79)">O</button>
+<button class="vickey" onclick="sendkey(80)">P</button>
 
 <script>
 function sendkey(key)
