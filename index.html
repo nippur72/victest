@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<!-- saved from url=(0044)http://www.mdawson.net/vic20chrome/vic20.php -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	
+	<link rel="stylesheet" href="./vic20.php_files/jquery-ui-1.8.23.custom.css" type="text/css" media="all">
+	<link rel="stylesheet" href="./vic20.php_files/superfish.css" type="text/css" media="all">
+	
+	<script type="text/javascript" async="" src="./vic20.php_files/ga.js"></script><script language="JavaScript" src="./vic20.php_files/analytics.js" type="text/javascript"><!-- x --></script>
+	<script language="JavaScript" src="./vic20.php_files/common.js" type="text/javascript"><!-- x --></script>
+	<!-- <script language="JavaScript" src="js/less-1.3.0.min.js" type="text/javascript"> -->
+	
+	<script language="JavaScript" src="./vic20.php_files/jquery-1.8.1.js" type="text/javascript"><!-- x --></script>
+	<script language="JavaScript" src="./vic20.php_files/jquery-ui-1.8.23.custom.min.js" type="text/javascript"><!-- x --></script><style type="text/css"></style>
+	<script language="JavaScript" src="./vic20.php_files/superfish.js" type="text/javascript"><!-- x --></script>
+	<script language="JavaScript" src="./vic20.php_files/supersubs.js" type="text/javascript"><!-- x --></script>
+</head>
+<body style="padding:0;margin:0">
+
+
+<script language="JavaScript" src="./vic20.php_files/event.js" type="text/javascript"><!-- x --></script>
+<script language="JavaScript" src="./vic20.php_files/carts.js" type="text/javascript"><!-- x --></script>
+<script language="JavaScript" src="./vic20.php_files/basic.js" type="text/javascript"><!-- x --></script>
+<script language="JavaScript" src="./vic20.php_files/vic20.js" type="text/javascript"><!-- x --></script>
+<script language="JavaScript" src="./vic20.php_files/vic6560.js" type="text/javascript"><!-- x --></script>
+<script language="JavaScript" src="./vic20.php_files/via6522.js" type="text/javascript"><!-- x --></script>
+<script language="JavaScript" src="./vic20.php_files/keyboard.js" type="text/javascript"><!-- x --></script>
+<script language="JavaScript" src="./vic20.php_files/tapedrive.js" type="text/javascript"><!-- x --></script>
+<script language="JavaScript" src="./vic20.php_files/cpu6502.js" type="text/javascript"><!-- x --></script>
+<script language="JavaScript" src="./vic20.php_files/cpu6502disassemble.js" type="text/javascript"><!-- x --></script>
+<script language="JavaScript" src="./vic20.php_files/cpu6502assemble.js" type="text/javascript"><!-- x --></script>
+
+<!--<canvas id="canvas" width="334" height="254" style="display: block; margin-left: auto; margin-right: auto; height: 480px; width: 512px;" onclick="fullscreen(true)">&nbsp;</canvas>-->
+<canvas id="canvas" style="display: block; margin-left: auto; margin-right: auto; height: 619px; width: 720px;" onclick="fullscreen(true)">&nbsp;</canvas>
+
+<br>
+<br>
+ FrameTime: <span id="frameTime">12.28 ms</span>
+
+<script>
+vic20 = new Vic20();
+var machineType = getURLParameter("machineType");
+if (machineType=="pal") {vic20.isPal=true;kerneldata=kerneldataPal;machineType="pal";}
+
+/*if (machineType=="ntsc") */ else {vic20.isPal=false;kerneldata=kerneldataNtsc;}
+
+
+vic20.init();
+vic20.execute();
+
+var url = getURLParameter("load");
+var urlmem = getURLParameter("mem");
+if (url && url!="" && url!=null && url!="null") {
+	if (url.indexOf(".csm")!=-1 || url.indexOf(".tap")!=-1) {
+		externalLoad("loadTape",url)
+	} else {
+		externalLoad("loadPrg",url);
+	}
+}
+
+function externalLoad(cmd,url,format, subfile) {
+	$("#selectZipFile").dialog("close");
+	console.debug("externalLoad cmd="+cmd+" url="+url+" format="+format+" subfile="+subfile);
+	fullscreen(true);
+	if (format) {
+		if(format=="pal") {
+			vic20.isPal=true;kerneldata=kerneldataPal;
+		}
+		if(format=="ntsc") {
+			vic20.isPal=false;kerneldata=kerneldataNtsc;
+		}
+	}
+	var head= document.getElementsByTagName('head')[0];
+	var script= document.createElement('script');
+	script.type= 'text/javascript';
+	// TODO encode
+	script.src= 'vic20/prgtojsloader.php?cmd='+cmd+'&prgurl='+url+'&subfile='+subfile;
+	head.appendChild(script);
+}
+
+function loadTapeCustom(tapeUrl) {
+	if (!tapeUrl) tapeUrl = window.prompt("Enter the URL to the tape including http://\nSupported formats are csm,tap,csm.gz, and tap.gz");
+	if (tapeUrl) {
+		externalLoad("loadTape",tapeUrl);
+	}
+}
+
+function loadTape(binhex) {
+	EventManager.event(EventTape.createInsertEvent(binToArray(binhex[0])));
+	Config.memoryAt0400 = Config.memoryAt2000 = Config.memoryAt4000 = Config.memoryAt6000 = Config.memoryAtA000 = false;
+	if (urlmem=="3k") Config.memoryAt0400 = true;
+	if (urlmem=="24k") Config.memoryAt2000 = Config.memoryAt4000 = Config.memoryAt6000 = Config.memoryAtA000 = true;
+	vic20.updateMemoryModules();
+	vic20.reset();
+	loadPrgSrc="tape";
+}
+
+function loadCartCustom() {
+	var cartUrl = window.prompt("Enter the URL to the cart including the http://");
+	if (cartUrl) {
+		externalLoad("loadPrg",cartUrl);
+	}
+}
+
+function loadPrgCustom() {
+	var cartUrl = window.prompt("Enter the URL to the prg including the http://");
+	if (cartUrl) {
+		externalLoad("loadPrg",cartUrl);
+	}
+}
+
+function chooseZipFile(options) {
+	validOptions = new Array();
+	for(var i=0; i<options.length; i++) {
+		if (options[i].indexOf(".prg")!=-1) {
+			$("#selectZipFiles").append($('<a>'+options[i]+'</a>').attr('href',"javascript:externalLoad(\'loadPrg\',\'"+url+"\',\'"+machineType+"\',\'"+options[i]+"\');")).append("<br/>");
+			validOptions.push(options[i]);
+		}
+	}
+	if (validOptions.length==0) {
+		alert("Sorry, no .prg files found in zip");
+	}
+	else if (validOptions.length==1) {
+		externalLoad('loadPrg',url,machineType,validOptions[0]);
+	}
+	else {
+		$("#selectZipFile").dialog();
+	}
+}
+</script>
+
+<div id="selectZipFile" style="display:none">
+	Select a file from the zip to open:
+	<div id="selectZipFiles">
+	</div>
+</div>
+
+<script>
+function updateMenuState() {
+	$("#joykeysopt").prop("checked", Config.joykeys);
+	$("#joykeysopt2").prop("checked", Config.joykeys);
+
+	$("#mem0400opt").prop("checked", Config.memoryAt0400);
+	$("#mem2000opt").prop("checked", Config.memoryAt2000);
+	$("#mem4000opt").prop("checked", Config.memoryAt4000);
+	$("#mem6000opt").prop("checked", Config.memoryAt6000);
+	$("#memA000opt").prop("checked", Config.memoryAtA000);
+	
+	$("#speedopt100").prop("checked", Config.speed==1);
+	$("#speedoptNoLimit").prop("checked", Config.speed!=1);
+	
+	$("#ntscUsaOpt").prop("checked",   kerneldata==kerneldataNtsc && chardata==chardataEnglish);
+	$("#ntscJapanOpt").prop("checked", kerneldata==kerneldataNtsc && chardata==chardataJapan);
+	$("#palWorldOpt").prop("checked",  kerneldata==kerneldataPal && chardata==chardataEnglish);
+	$("#palSweFiOpt").prop("checked",  kerneldata==kerneldataPal && chardata==chardataSwedenFinland);
+}
+
+updateMenuState();
+
+function playTape() {
+	Config.tapePlay=true;
+	updateDatasetteView();	
+}
+
+function stopTape() {
+	Config.tapePlay=false;
+	updateDatasetteView();	
+}
+
+function datasetteMouseClick() {
+	$('#tapeZoom').dialog({width:300,height:440,position:{my:"left",at:"left",of:$("#datasettesmall")}});
+	updateDatasetteView();
+}
+
+function updateDatasetteView(event) {
+	if (event && event.filepath) {
+		datasetteMouseClick();
+	}
+	$("#datasette_empty,#datasette_stopped,#datasette_play").hide();
+	if (Config.tapePlay) {
+		$("#datasette_play").show();
+		$("#datasette_empty,#datasette_stopped").hide();
+	} else if (vic20.tapedrive.isTapeLoaded()) {
+		$("#datasette_stopped").show();
+		$("#datasette_empty,#datasette_play").hide();
+	} else {
+		$("#datasette_empty").show();
+		$("#datasette_stopped,#datasette_play").hide();
+	}
+}
+
+EventManager.listen("EventTape", updateDatasetteView);
+
+function pasteBasicProgram() {
+	KeyboardUnhook();
+	$("#basicDialog").dialog({
+			title: 'Basic Listing',
+			width: 700,
+			height: 300,
+			close: function(event, ui) { KeyboardHook(); loadPrgFromBasicString($("#pasteBasic").val()); return true; }
+	});
+	$("#pasteBasic").val(memoryToAsciiBasic(mem));
+}
+
+var assembler = new Cpu6502assembler();
+
+function pasteAssemblerProgram() {
+	KeyboardUnhook();
+	$("#assemblerDialog").dialog({
+			title: 'Assembler Listing',
+			width: 'auto',
+			close: function(event, ui) {
+				KeyboardHook();
+				return true;
+			}
+	});
+}
+
+function compile() {
+	var result = assembler.compile($("#pasteAssembler").val());
+	var fb = "";
+	for(var i=0; i<result.feedback.length; i++) {
+		fb += result.feedback[i].message + "\n";
+	}
+	$("#assemblerFeedback").val(fb);
+	if (result.success) {
+		for(var i=0; i<65536; i++) {
+			if (result.m[i]!==undefined) {
+				mem[i] = result.m[i];
+				memExec[i] = 2;
+			}
+		}
+	}
+}
+</script>
+
+<div id="basicDialog" style="display:none">
+	<p>Paste/Type your program then close this dialog:</p><p>
+	<textarea id="pasteBasic" style="width:100%;height:100%;">&nbsp;</textarea>
+</p></div>
+
+<div id="assemblerDialog" style="display:none">
+	Paste/Type your assembler here:<br>
+	<textarea id="pasteAssembler" style="width:600px;height:300px;"></textarea><br>
+	<button onclick="compile()">Compile</button>(automatically copies to memory on success)<br>
+	Compiler Output:<br>
+	<textarea id="assemblerFeedback" style="width:600px;height:100px;"></textarea>
+</div>
+	
+
+
+
+
+
+</body></html>

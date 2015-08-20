@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<!-- saved from url=(0044)http://www.mdawson.net/vic20chrome/vic20.php -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	
+	<link rel="stylesheet" href="./vic20.php_files/jquery-ui-1.8.23.custom.css" type="text/css" media="all">
+	<link rel="stylesheet" href="./vic20.php_files/superfish.css" type="text/css" media="all">
+	
+	<script type="text/javascript" async="" src="./vic20.php_files/ga.js"></script><script language="JavaScript" src="./vic20.php_files/analytics.js" type="text/javascript"><!-- x --></script>
+	<script language="JavaScript" src="./vic20.php_files/common.js" type="text/javascript"><!-- x --></script>
+	<!-- <script language="JavaScript" src="js/less-1.3.0.min.js" type="text/javascript"> -->
+	
+	<script language="JavaScript" src="./vic20.php_files/jquery-1.8.1.js" type="text/javascript"><!-- x --></script>
+	<script language="JavaScript" src="./vic20.php_files/jquery-ui-1.8.23.custom.min.js" type="text/javascript"><!-- x --></script><style type="text/css"></style>
+	<script language="JavaScript" src="./vic20.php_files/superfish.js" type="text/javascript"><!-- x --></script>
+	<script language="JavaScript" src="./vic20.php_files/supersubs.js" type="text/javascript"><!-- x --></script>
+</head>
+<body style="padding:0;margin:0">
+
+<!--
+ Copyright 2009-
+ matsondawson@gmail.com
+ Not reproducible in any way without permission. 
+-->
+
+<!-- JS to add -->
+<script type="text/javascript">
+$().ready(function(){
+	$('ul.sf-menu').supersubs({ minWidth: 1, maxWidth: 141, extraWidth: 1 }).superfish({delay:1000});
+});	
+</script>
+
+<script language="JavaScript" src="./vic20.php_files/event.js" type="text/javascript"><!-- x --></script>
+<script language="JavaScript" src="./vic20.php_files/carts.js" type="text/javascript"><!-- x --></script>
+<script language="JavaScript" src="./vic20.php_files/basic.js" type="text/javascript"><!-- x --></script>
+<script language="JavaScript" src="./vic20.php_files/vic20.js" type="text/javascript"><!-- x --></script>
+<script language="JavaScript" src="./vic20.php_files/vic6560.js" type="text/javascript"><!-- x --></script>
+<script language="JavaScript" src="./vic20.php_files/via6522.js" type="text/javascript"><!-- x --></script>
+<script language="JavaScript" src="./vic20.php_files/keyboard.js" type="text/javascript"><!-- x --></script>
+<script language="JavaScript" src="./vic20.php_files/tapedrive.js" type="text/javascript"><!-- x --></script>
+<script language="JavaScript" src="./vic20.php_files/cpu6502.js" type="text/javascript"><!-- x --></script>
+<script language="JavaScript" src="./vic20.php_files/cpu6502disassemble.js" type="text/javascript"><!-- x --></script>
+<script language="JavaScript" src="./vic20.php_files/cpu6502assemble.js" type="text/javascript"><!-- x --></script>
+
+<style>
+p,body,textarea{
+	font-size:12px;
+}
+
+/* Jquery styles */
+.ui-dialog .ui-dialog-titlebar, .ui-dialog .ui-dialog-buttonpane { font-size: 12px; }
+
+/* local styles */
+#debug {
+	border-collapse:collapse;
+	font-family: monospace;
+}
+
+#debug th {	
+	text-align:left;
+	background-color:lightblue;
+	border:1px solid black;
+}
+
+#debug td {
+	padding:1px 2px;
+	border:1px solid black;
+	vertical-align:top;
+}
+
+#debug2 {
+	border-collapse:collapse;
+	font-family: monospace;
+}
+
+#debug2 th {	
+	text-align:left;
+	background-color:lightblue;
+	border:1px solid black;
+}
+
+#debug2 td {
+	padding:1px 2px;
+	border:1px solid black;
+	vertical-align:top;
+}
+
+#tapeZoom {
+	background-color:#ccc;
+}
+
+#datasettesmall {
+	padding:30px 0px 30px 20px;border:1px solid #ccc;background-repeat:no-repeat;background-position:right top;background-image:url(vic20/clickme_gray.png);
+}
+#datasettesmall:hover {
+	padding:30px 0px 30px 20px;border:1px solid #aaa;background-repeat:no-repeat;background-position:right top;background-image:url(vic20/clickme.png);
+}
+
+#radPlayground,#radCodify,#radDebug { position:absolute; left:-100px; top: -100px; }
+#modePlayground,#modeDebug,#modeCodify { display: none; }
+#radPlayground:checked ~ div #modePlayground, #radCodify:checked ~ div #modeCodify, #radDebug:checked ~ div #modeDebug { display: block; }
+
+
+
+* Set the size and font of the tab widget */
+.tabGroup {
+    font: 10pt arial, verdana;
+    width: 800px;
+    height: 400px;
+}
+ 
+/* Configure the radio buttons to hide off screen */
+.tabGroup > input[type="radio"] {
+    position: absolute;
+    left:-100px;
+    top:-100px;
+}
+ 
+/* Configure labels to look like tabs */
+.tabGroup > input[type="radio"] + label {
+    /* inline-block such that the label can be given dimensions */
+    display: inline-block;
+ 
+    /* A nice curved border around the tab */
+    border: 1px solid black;
+    border-radius: 5px 5px 0 0;
+    -moz-border-radius: 5px 5px 0 0;
+    -webkit-border-radius: 5px 5px 0 0;
+     
+    /* the bottom border is handled by the tab content div */
+    border-bottom: 0;
+ 
+    /* Padding around tab text */
+    padding: 5px 10px;
+ 
+    /* Set the background color to default gray (non-selected tab) */
+    background-color:#ddd;
+}
+ 
+/* Focused tabs need to be highlighted as such */
+.tabGroup > input[type="radio"]:focus + label {
+    border:1px dashed black;
+}
+ 
+/* Checked tabs must be white with the bottom border removed */
+.tabGroup > input[type="radio"]:checked + label {
+    background-color:white;
+    font-weight: bold;
+    border-bottom: 1px solid white;
+    margin-bottom: -1px;
+}
+ 
+/* The tab content must fill the widgets size and have a nice border */
+.tabGroup > div {
+    display: none;
+    border: 1px solid black;
+    background-color: white;
+    padding: 10px 10px;
+    height: 100%;
+    overflow: auto;
+     
+    box-shadow: 0 0 20px #444;
+    -moz-box-shadow: 0 0 20px #444;
+    -webkit-box-shadow: 0 0 20px #444;
+     
+    border-radius: 0 5px 5px 5px;
+    -moz-border-radius: 0 5px 5px 5px;
+    -webkit-border-radius: 0 5px 5px 5px;
+}
+ 
+/* This matchs tabs displaying to thier associated radio inputs */
+.tab1:checked ~ .tab1, .tab2:checked ~ .tab2, .tab3:checked ~ .tab3, .tab4:checked ~ .tab4, .tab5:checked ~ .tab5, .tab6:checked ~ .tab6 {
+    display: block;
+}
+</style>
+
+<input type="radio" name="radMode" id="radPlayground" checked="checked" onchange="closeDebug()">
+<input type="radio" name="radMode" id="radCodify">
+<input type="radio" name="radMode" id="radDebug" onchange="debug()">
+
+<ul class="sf-menu sf-js-enabled sf-shadow">
+	<li><a href="javascript:" class="sf-with-ul"><img src="./vic20.php_files/icon.png" border="0" style="height:10px;border:0;padding:none;margin:none;"><span class="sf-sub-indicator"> »</span></a>
+		<ul style="float: none; width: 10.4166666666667em; display: none; visibility: hidden;">
+			<li style="white-space: normal; float: left; width: 100%;"><a href="javascript:" onclick="$(&#39;#knownIssuesHelp&#39;).dialog({width:800})" style="float: none; width: auto;">Known Issues...</a></li>
+			<li style="white-space: normal; float: left; width: 100%;"><a href="mailto:matsondawson@gmail.com?subject=Javascript%20Vic-20%20Bug!" target="_blank" style="float: none; width: auto;">Report a bug...</a></li>
+			
+			<li style="white-space: normal; float: left; width: 100%;"><a href="javascript:" onclick="$(&#39;#aboutHelp&#39;).dialog()" style="float: none; width: auto;">About...</a></li>
+		</ul>
+	</li>
+	
+	<li><a href="javascript:" class="sf-with-ul">Mode<span class="sf-sub-indicator"> »</span></a>
+		<ul style="float: none; width: 8.5em; display: none; visibility: hidden;">
+			<li style="white-space: normal; float: left; width: 100%;"><label for="radPlayground"><a>Playground</a></label></li>
+			<!--<li><label for="radCodify"><a>Codify</a></label></li>-->
+			<li style="white-space: normal; float: left; width: 100%;"><label for="radDebug"><a>Debug</a></label></li>
+			<li style="font-size: 1px; white-space: normal; float: left; width: 100%;"><hr></li>
+			<li style="white-space: normal; float: left; width: 100%;"><a href="javascript:" onclick="fullscreen()" style="float: none; width: auto;">Fullscreen</a></li>
+		</ul>
+	</li>
+	
+	<li><a href="javascript:" class="sf-with-ul">Control<span class="sf-sub-indicator"> »</span></a>
+		<ul style="float: none; width: 12em; display: none; visibility: hidden;">
+			<li style="white-space: normal; float: left; width: 100%;"><a href="javascript:vic20.softreset()" style="float: none; width: auto;">Soft Reset</a></li>
+			<li style="white-space: normal; float: left; width: 100%;"><a href="javascript:vic20.reset()" style="float: none; width: auto;">Hard Reset</a></li>
+			<li style="font-size: 1px; white-space: normal; float: left; width: 100%;"><hr></li>
+			<li style="white-space: normal; float: left; width: 100%;"><a href="javascript:" style="float: none; width: auto;"><input style="margin-left:-16px;margin-right:5px;" type="checkbox" id="joykeysopt" onclick="{Config.joykeys=!Config.joykeys;updateMenuState();}"><label for="joykeysopt">Enable Joy Keys</label></a></li>
+			<li style="white-space: normal; float: left; width: 100%;"><a href="javascript:" onclick="$(&#39;#joykeysHelp&#39;).dialog()" style="float: none; width: auto;">Configure Joy Keys</a></li>
+		</ul>
+	</li>
+	<li><a href="javascript:" class="sf-with-ul">Configure<span class="sf-sub-indicator"> »</span></a>
+		<ul style="float: none; width: 7.41666666666667em; display: none; visibility: hidden;">
+			<li style="white-space: normal; float: left; width: 100%;"><a href="javascript:" style="float: none; width: auto;" class="sf-with-ul">Memory<span class="sf-sub-indicator"> »</span></a>
+				<ul style="left: 7.41666666666667em; float: none; width: 10em; display: none; visibility: hidden;">
+					<li style="white-space: normal; float: left; width: 100%;"><a href="javascript:" style="float: none; width: auto;"><input style="margin-left:-16px;margin-right:5px;" type="checkbox" id="mem0400opt" onclick="{Config.memoryAt0400=!Config.memoryAt0400;vic20.updateMemoryModules();updateMenuState();}"><label for="mem0400opt"><b>3KB @ $0400</b></label></a></li>
+					<li style="white-space: normal; float: left; width: 100%;"><a href="javascript:" style="float: none; width: auto;"><input style="margin-left:-16px;margin-right:5px;" type="checkbox" id="mem2000opt" onclick="{Config.memoryAt2000=!Config.memoryAt2000;vic20.updateMemoryModules();updateMenuState();}"><label for="mem2000opt"><b>8KB @ $2000</b></label></a></li>
+					<li style="white-space: normal; float: left; width: 100%;"><a href="javascript:" style="float: none; width: auto;"><input style="margin-left:-16px;margin-right:5px;" type="checkbox" id="mem4000opt" onclick="{Config.memoryAt4000=!Config.memoryAt4000;vic20.updateMemoryModules();updateMenuState();}"><label for="mem4000opt"><b>8KB @ $4000</b></label></a></li>
+					<li style="white-space: normal; float: left; width: 100%;"><a href="javascript:" style="float: none; width: auto;"><input style="margin-left:-16px;margin-right:5px;" type="checkbox" id="mem6000opt" onclick="{Config.memoryAt6000=!Config.memoryAt6000;vic20.updateMemoryModules();updateMenuState();}"><label for="mem6000opt"><b>8KB @ $6000</b></label></a></li>
+					<li style="white-space: normal; float: left; width: 100%;"><a href="javascript:" style="float: none; width: auto;"><input style="margin-left:-16px;margin-right:5px;" type="checkbox" id="memA000opt" onclick="{Config.memoryAtA000=!Config.memoryAtA000;vic20.updateMemoryModules();updateMenuState();}"><label for="memA000opt"><b>8KB @ $A000</b></label></a></li>
+				</ul>
+			</li>
+			<li style="white-space: normal; float: left; width: 100%;"><a href="javascript:" style="float: none; width: auto;" class="sf-with-ul">Model<span class="sf-sub-indicator"> »</span></a>
+				<ul style="left: 7.41666666666667em; float: none; width: 13.4166666666667em; display: none; visibility: hidden;">
+					<li style="white-space: normal; float: left; width: 100%;"><a href="javascript:" onclick="{vic20.isPal=false;kerneldata=kerneldataNtsc;chardata=chardataEnglish;updateMenuState();vic20.reset();}" style="float: none; width: auto;"><input style="margin-left:-16px;margin-right:5px;" type="checkbox" id="ntscUsaOpt" onclick="$(this).parent().click();">NTSC (USA)</a></li>
+					<li style="white-space: normal; float: left; width: 100%;"><a href="javascript:" onclick="{vic20.isPal=false;kerneldata=kerneldataNtsc;chardata=chardataJapan;updateMenuState();vic20.reset();}" style="float: none; width: auto;"><input style="margin-left:-16px;margin-right:5px;" type="checkbox" id="ntscJapanOpt" onclick="$(this).parent().click();">NTSC (JAPAN)</a></li>
+					<li style="white-space: normal; float: left; width: 100%;"><a href="javascript:" onclick="{vic20.isPal=true;kerneldata=kerneldataPal;chardata=chardataEnglish;updateMenuState();vic20.reset();}" style="float: none; width: auto;"><input style="margin-left:-16px;margin-right:5px;" type="checkbox" id="palWorldOpt" onclick="$(this).parent().click();">PAL (World)</a></li>
+					<li style="white-space: normal; float: left; width: 100%;"><a href="javascript:" onclick="{vic20.isPal=true;kerneldata=kerneldataPal;chardata=chardataSwedenFinland;updateMenuState();vic20.reset();}" style="float: none; width: auto;"><input style="margin-left:-16px;margin-right:5px;" type="checkbox" id="palSweFiOpt" onclick="$(this).parent().click();">PAL (Sweden/Finland)</a></li>
+				</ul>
+			</li>
+			<li style="white-space: normal; float: left; width: 100%;"><a href="javascript:" style="float: none; width: auto;" class="sf-with-ul">Speed<span class="sf-sub-indicator"> »</span></a>
+				<ul style="left: 7.41666666666667em; float: none; width: 7.25em; display: none; visibility: hidden;">
+					<li style="white-space: normal; float: left; width: 100%;"><a href="javascript:" style="float: none; width: auto;"><input style="margin-left:-16px;margin-right:5px;" type="checkbox" id="speedopt100" onclick="{Config.speed=1;updateMenuState();}"><label for="speedopt100">100%</label></a></li>
+					<li style="white-space: normal; float: left; width: 100%;"><a href="javascript:" style="float: none; width: auto;"><input style="margin-left:-16px;margin-right:5px;" type="checkbox" id="speedoptNoLimit" onclick="{Config.speed=5;updateMenuState();}"><label for="speedoptNoLimit">No limit</label></a></li>
+				</ul>
+			</li>
+		</ul>
+	</li>
+	
+	<li><a href="javascript:" class="sf-with-ul">Storage<span class="sf-sub-indicator"> »</span></a>
+		<ul style="float: none; width: 15.9166666666667em; display: none; visibility: hidden;">
+			<!--<li><a href="vic20/games/.index.html">Games List...</a></li>
+			<li><a href="javascript:pasteBasicProgram();">Edit/View Basic program...</a></li>-->
+			<li style="white-space: normal; float: left; width: 100%;"><a href="javascript:pasteAssemblerProgram();" style="float: none; width: auto;">Edit an Assembler program...</a></li>
+			<li style="white-space: normal; float: left; width: 100%;"><a href="javascript:" style="float: none; width: auto;" class="sf-with-ul">Tape<span class="sf-sub-indicator"> »</span></a>
+				<ul style="left: 15.9166666666667em; float: none; width: 14em; display: none; visibility: hidden;">
+					<li style="white-space: normal; float: left; width: 100%;"><a href="javascript:loadTapeCustom();" style="float: none; width: auto;">Insert Tape From URL...</a></li>
+					<li style="white-space: normal; float: left; width: 100%;"><a href="javascript:playTape();" style="float: none; width: auto;">Play Tape</a></li>
+					<li style="white-space: normal; float: left; width: 100%;"><a href="javascript:stopTape();" style="float: none; width: auto;">Stop Tape</a></li>
+					<li style="white-space: normal; float: left; width: 100%;"><a href="javascript:loadTapeCustom('http://www.mdawson.net/vic20chrome/vic20/programs/Abductor.csm.gz');" style="float: none; width: auto;">Insert Abductor.csm.gz</a></li>
+				</ul>
+			</li>
+			<li style="white-space: normal; float: left; width: 100%;"><a href="javascript:" style="float: none; width: auto;" class="sf-with-ul">Carts/Programs<span class="sf-sub-indicator"> »</span></a>
+				<ul style="left: 15.9166666666667em; float: none; width: 13.25em; display: none; visibility: hidden;">
+					<li style="white-space: normal; float: left; width: 100%;"><a href="javascript:loadCartCustom();" style="float: none; width: auto;">Load Cart from URL...</a></li>
+					<li style="white-space: normal; float: left; width: 100%;"><a href="javascript:loadPrgCustom();" style="float: none; width: auto;">Load Prg from URL...</a></li>
+					<li style="font-size: 1px; white-space: normal; float: left; width: 100%;"><hr></li>
+					<li style="white-space: normal; float: left; width: 100%;"><a href="javascript:externalLoad('loadPrg','http://www.mdawson.net/vic20chrome/vic20/programs/AE-6000.prg,http://www.mdawson.net/vic20chrome/vic20/programs/AE-a000.prg','ntsc')" style="float: none; width: auto;">AE</a></li>
+					<li style="white-space: normal; float: left; width: 100%;"><a href="javascript:externalLoad('loadPrg','http://www.mdawson.net/vic20chrome/vic20/programs/Alien Blitz.prg','ntsc')" style="float: none; width: auto;">Alien Blitz</a></li>
+					<li style="white-space: normal; float: left; width: 100%;"><a href="javascript:externalLoad('loadPrg','http://www.mdawson.net/vic20chrome/vic20/programs/Atlantis.NTSC.prg','ntsc')" style="float: none; width: auto;">Atlantis</a></li>
+					<li style="white-space: normal; float: left; width: 100%;"><a href="javascript:externalLoad('loadPrg','http://www.mdawson.net/vic20chrome/vic20/programs/Bandits.prg','ntsc')" style="float: none; width: auto;">Bandits</a></li>
+					<li style="white-space: normal; float: left; width: 100%;"><a href="javascript:externalLoad('loadPrg','http://www.mdawson.net/vic20chrome/vic20/programs/berzerk-mmx-plus.prg','ntsc')" style="float: none; width: auto;">Berzerk</a></li>
+					<li style="white-space: normal; float: left; width: 100%;"><a href="javascript:externalLoad('loadPrg','http://www.mdawson.net/vic20chrome/vic20/programs/Battlezone-6000.prg,http://www.mdawson.net/vic20chrome/vic20/programs/Battlezone-a000.prg','ntsc')" style="float: none; width: auto;">Battle Zone</a></li>
+					<li style="white-space: normal; float: left; width: 100%;"><a href="javascript:externalLoad('loadPrg','http://www.mdawson.net/vic20chrome/vic20/programs/Buck Rogers-6000.prg,http://www.mdawson.net/vic20chrome/vic20/programs/Buck Rogers-a000.prg','ntsc')" style="float: none; width: auto;">Buck Rogers</a></li>
+					<li style="white-space: normal; float: left; width: 100%;"><a href="javascript:externalLoad('loadPrg','http://www.mdawson.net/vic20chrome/vic20/programs/Centipede-2000.prg,http://www.mdawson.net/vic20chrome/vic20/programs/Centipede-a000.prg','ntsc')" style="float: none; width: auto;">Centipede</a></li>
+					<li style="white-space: normal; float: left; width: 100%;"><a href="javascript:externalLoad('loadPrg','http://www.mdawson.net/vic20chrome/vic20/programs/Choplifter.prg','ntsc')" style="float: none; width: auto;">Choplifter</a></li>
+					<li style="white-space: normal; float: left; width: 100%;"><a href="javascript:externalLoad('loadPrg','http://www.mdawson.net/vic20chrome/vic20/programs/Clowns.prg','ntsc')" style="float: none; width: auto;">Clowns</a></li>
+					<li style="white-space: normal; float: left; width: 100%;"><a href="javascript:externalLoad('loadPrg','http://www.mdawson.net/vic20chrome/vic20/programs/datapop.prg','pal')" style="float: none; width: auto;">Datapop Demo</a></li>
+					<li style="white-space: normal; float: left; width: 100%;"><a href="javascript:externalLoad('loadPrg','http://www.mdawson.net/vic20chrome/vic20/programs/Dig Dug-2000.prg,http://www.mdawson.net/vic20chrome/vic20/programs/Dig Dug-a000.prg','ntsc')" style="float: none; width: auto;">Dig Dug</a></li>
+					<li style="white-space: normal; float: left; width: 100%;"><a href="javascript:externalLoad('loadPrg','http://www.mdawson.net/vic20chrome/vic20/programs/Donkey Kong-2000.prg,http://www.mdawson.net/vic20chrome/vic20/programs/Donkey Kong-a000.prg','ntsc')" style="float: none; width: auto;">Donkey Kong</a></li>
+					<li style="white-space: normal; float: left; width: 100%;"><a href="javascript:externalLoad('loadPrg','http://www.mdawson.net/vic20chrome/vic20/programs/frogger07.prg','pal')" style="float: none; width: auto;">Frogger'07</a></li>
+					<li style="white-space: normal; float: left; width: 100%;"><a href="javascript:externalLoad('loadPrg','http://www.mdawson.net/vic20chrome/vic20/programs/Galaxian.prg','ntsc')" style="float: none; width: auto;">Galaxian</a></li>
+					<li style="white-space: normal; float: left; width: 100%;"><a href="javascript:externalLoad('loadPrg','http://www.mdawson.net/vic20chrome/vic20/programs/Gunslinger.prg','pal')" style="float: none; width: auto;">Gunslinger</a></li>
+					<li style="white-space: normal; float: left; width: 100%;"><a href="javascript:externalLoad('loadPrg','http://www.mdawson.net/vic20chrome/vic20/programs/Jungle Hunt-6000.prg,http://www.mdawson.net/vic20chrome/vic20/programs/Jungle Hunt-a000.prg','ntsc')" style="float: none; width: auto;">Jungle Hunt</a></li>
+					<li style="white-space: normal; float: left; width: 100%;"><a href="javascript:externalLoad('loadPrg','http://www.mdawson.net/vic20chrome/vic20/programs/Jupiter Lander.prg','ntsc')" style="float: none; width: auto;">Jupiter Lander</a></li>
+					<li style="white-space: normal; float: left; width: 100%;"><a href="javascript:externalLoad('loadPrg','http://www.mdawson.net/vic20chrome/vic20/programs/Lode Runner-6000.prg,http://www.mdawson.net/vic20chrome/vic20/programs/Lode Runner-a000.prg','ntsc')" style="float: none; width: auto;">Lode Runner</a></li>
+					<li style="white-space: normal; float: left; width: 100%;"><a href="javascript:externalLoad('loadPrg','http://www.mdawson.net/vic20chrome/vic20/programs/Moon Patrol-6000.prg,http://www.mdawson.net/vic20chrome/vic20/programs/Moon Patrol-a000.prg','ntsc')" style="float: none; width: auto;">Moon Patrol</a></li>
+					<li style="white-space: normal; float: left; width: 100%;"><a href="javascript:externalLoad('loadPrg','http://www.mdawson.net/vic20chrome/vic20/programs/Mower Mania.prg','pal')" style="float: none; width: auto;">Mower Mania</a></li>
+					<li style="white-space: normal; float: left; width: 100%;"><a href="javascript:externalLoad('loadPrg','http://www.mdawson.net/vic20chrome/vic20/programs/Ms. Pac-Man-6000.prg,http://www.mdawson.net/vic20chrome/vic20/programs/Ms. Pac-Man-a000.prg','ntsc')" style="float: none; width: auto;">Ms. Pac-Man</a></li>
+					<li style="white-space: normal; float: left; width: 100%;"><a href="javascript:externalLoad('loadPrg','http://www.mdawson.net/vic20chrome/vic20/programs/Omega Race-orig.prg','ntsc')" style="float: none; width: auto;">Omega Race</a></li>
+					<li style="white-space: normal; float: left; width: 100%;"><a href="javascript:externalLoad('loadPrg','http://www.mdawson.net/vic20chrome/vic20/programs/Poker-2.prg','ntsc')" style="float: none; width: auto;">Poker</a></li>
+					<li style="white-space: normal; float: left; width: 100%;"><a href="javascript:externalLoad('loadPrg','http://www.mdawson.net/vic20chrome/vic20/programs/Pole Position-6000.prg,http://www.mdawson.net/vic20chrome/vic20/programs/Pole Position-a000.prg','ntsc')" style="float: none; width: auto;">Pole Position</a></li>
+					<li style="white-space: normal; float: left; width: 100%;"><a href="javascript:externalLoad('loadPrg','http://www.mdawson.net/vic20chrome/vic20/programs/Psycho Shopper.prg','pal')" style="float: none; width: auto;">Psycho Shopper</a></li>
+					<li style="white-space: normal; float: left; width: 100%;"><a href="javascript:externalLoad('loadPrg','http://www.mdawson.net/vic20chrome/vic20/programs/quikmanplus8k.prg','pal')" style="float: none; width: auto;">Quikman</a></li>
+					<li style="white-space: normal; float: left; width: 100%;"><a href="javascript:externalLoad('loadPrg','http://www.mdawson.net/vic20chrome/vic20/programs/River Rescue.prg','ntsc')" style="float: none; width: auto;">River Rescue</a></li>
+					<li style="white-space: normal; float: left; width: 100%;"><a href="javascript:externalLoad('loadPrg','http://www.mdawson.net/vic20chrome/vic20/programs/rl-16k.prg','pal')" style="float: none; width: auto;">Robotic Liberation</a></li>
+					<li style="white-space: normal; float: left; width: 100%;"><a href="javascript:externalLoad('loadPrg','http://www.mdawson.net/vic20chrome/vic20/programs/tetris.prg','pal')" style="float: none; width: auto;">Tetris</a></li>
+					<li style="white-space: normal; float: left; width: 100%;"><a href="javascript:externalLoad('loadPrg','http://www.mdawson.net/vic20chrome/vic20/programs/Visible Solar System-2.prg','ntsc')" style="float: none; width: auto;">Visible Solar System</a></li>
+					<li style="white-space: normal; float: left; width: 100%;"><a href="javascript:externalLoad('loadPrg','http://www.mdawson.net/vic20chrome/vic20/programs/warrior.prg','pal')" style="float: none; width: auto;">Warrior</a></li>
+					
+				</ul>
+			</li>
+			
+		</ul>
+	</li>
+	
+	<li><a href="javascript:" class="sf-with-ul">Reference<span class="sf-sub-indicator"> »</span></a>
+		<ul style="float: none; width: 14.25em; display: none; visibility: hidden;">
+			
+			<li style="white-space: normal; float: left; width: 100%;"><a href="http://www.mdawson.net/vic20chrome/cpu/mos_6500_mpu_preliminary_may_1976.pdf" target="CPU6502PDF" style="float: none; width: auto;">6502 Datasheet</a></li>
+			<li style="white-space: normal; float: left; width: 100%;"><a href="http://www.unusedino.de/ec64/technical/aay/c64/bmain.htm" target="_blank" style="float: none; width: auto;">6502 instruction set</a>
+			</li><li style="white-space: normal; float: left; width: 100%;"><a href="http://www.mdawson.net/vic20chrome/vic20/docs/kernel_disassembly.txt" target="KERNEL_DISASSEMBLY" style="float: none; width: auto;">Kernel Disassembly</a></li>
+			<li style="white-space: normal; float: left; width: 100%;"><a href="http://www.mdawson.net/vic20chrome/vic20/docs/memorymap.html" target="MEMORY_MAP" style="float: none; width: auto;">Memory Map</a></li>
+			<li style="white-space: normal; float: left; width: 100%;"><a href="http://sta.c64.org/cbm64pet.html" target="PETSCII_CODES" style="float: none; width: auto;">PETSCII Codes</a></li>
+			
+			<li style="white-space: normal; float: left; width: 100%;"><a href="http://www.mdawson.net/vic20chrome/display/mos_6560_6561_vic.pdf" target="VIC6560PDF" style="float: none; width: auto;">Vic 6560/6561 Datasheet</a></li>
+			<li style="white-space: normal; float: left; width: 100%;"><a href="http://www.mdawson.net/vic20chrome/peripheral/w65c22s.pdf" target="VIA6522PDF" style="float: none; width: auto;">Via 6522 Datasheet</a></li>
+			<li style="white-space: normal; float: left; width: 100%;"><a href="http://personalpages.tds.net/~rcarlsen/cbm/vic20.txt" target="VIA6522PDF" style="float: none; width: auto;">Repair Guide</a></li>
+			<li style="white-space: normal; float: left; width: 100%;"><a href="http://www.fpgaarcade.com/resources/keyboard.txt" target="FPGAREF" style="float: none; width: auto;">FPGA arcade reference</a></li>
+			<li style="white-space: normal; float: left; width: 100%;"><a href="javascript:" style="float: none; width: auto;" class="sf-with-ul">Schematics<span class="sf-sub-indicator"> »</span></a>
+				<ul style="left: 14.25em; float: none; width: 11.6666666666667em; display: none; visibility: hidden;">
+					<li style="white-space: normal; float: left; width: 100%;"><a href="http://www.mainbyte.com/vic20/e_schematic.pdf" target="SCHEME" style="float: none; width: auto;">Revision E (NTSC)</a></li>
+					<li style="white-space: normal; float: left; width: 100%;"><a href="http://www.mainbyte.com/vic20/n_schematic.pdf" target="SCHEMN" style="float: none; width: auto;">Revision N (PAL)</a></li>
+				</ul>
+			</li>
+			<li style="font-size: 1px; white-space: normal; float: left; width: 100%;"><hr></li>
+			<li style="white-space: normal; float: left; width: 100%;"><a href="http://www.sleepingelephant.com/denial/" target="ZIMMERS" style="float: none; width: auto;">Denial</a></li>
+			<li style="white-space: normal; float: left; width: 100%;"><a href="http://www.mainbyte.com/vic20/" target="ZIMMERS" style="float: none; width: auto;">MainByte</a></li>
+			<li style="white-space: normal; float: left; width: 100%;"><a href="http://www.zimmers.net/anonftp/pub/cbm/vic20/" target="ZIMMERS" style="float: none; width: auto;">Zimmers</a></li>
+		</ul>
+	</li>
+</ul>
+
+<div id="joykeysHelp" style="display:none" title="Joy Keys configuration (WIP)">
+Joy Keys are the arrow keys and tilde(~)
+</div>
+
+<div id="memoryTaggingHelp" style="display:none" title="Memory Tagging Help">
+Each memory location has a memory tag value.<br>
+When code is executed the set memory tag is or'ed with the current memory tag value.<br>
+This enables you to work out what code executed as the result of an action.<br>
+e.g.
+<ol>
+	<li>Start the Vic20 as normal to the cursor.</li>
+	<li>The initial value is '1' so all executed memory locations are tagged as '1'.</li>
+	<li>Invoke the debugger by pressing 'Step' or entering the debugger if you are in play mode.</li>
+	<li>Change the tag value to '2'.</li>
+	<li>Select 'Run'</li>
+	<li>Type a character</li>
+	<li>Invoke the debugger by pressing 'Step'</li>
+	<li>In the disassembly window set the filter value to 2,2 and this will show all code that executed under 2</li>
+	<li>To see all code the executed exclusively under 2, set the filter value to 2,3</li>
+</ol>
+</div>
+
+<div id="knownIssuesHelp" style="display:none" title="Known issues">
+	<ul>
+		<li>Fixable
+			<ul>
+				<li>Basic compiler/decompiler does not handle escape codes correctly</li>
+				<li>Robotic Liberation cube does not render</li>
+				<li>Audio needs a low pass filter</li>
+			</ul>
+		</li>
+		<li>Unfixable
+			<ul>
+				<li>Right hand shift reads as left hand as browsers don't differentiate</li>
+			</ul>
+		</li>
+		<li>TODO
+			<ul>
+				<li>NTSC progressive scan</li>
+				<li>PAL VIC audio LFSR</li>
+				<li>VIC noise LFSR</li>
+				<li>Paddles</li>
+				<li>Light pen</li>
+				<li>1540/1541 FDD</li>
+				<li>1520 Plotter</li>
+				<li>Implement game vault based off GB20</li>
+				<li>Tape animations, counter and optional noise</li>
+				<li>User logins for storing/sharing basic/assembler programs</li>
+				<li>Conditional breakpoints</li>
+			</ul>
+		</li>
+	</ul>
+</div>
+
+<div id="aboutHelp" style="display:none" title="About">
+Javascript Vic-20 by Matt Dawson<br>
+Email: <a href="mailto:matsondawson@gmail.com?subject=Javascript%20Vic-20%20Query" target="_blank">matsondawson@gmail.com</a><br>
+Copyright (c) 2009
+</div>
+
+
+<br>
+<br>
+<br><br>
+
+	<!-- Debug = pause system and open debug dialog -->
+
+	<script>
+	styleMenubar();
+	
+	function closeDebug() {
+		KeyboardHook();
+		if(isDebugging) {
+			isDebugging = false;
+			vic20.execute();
+		}
+		vic20.vic.initCanvas();
+	}
+	isDebugging = false;
+	function debug() {
+		$("#debugpausebutton").attr('disabled',true);
+		$("#debugrunbutton").attr('disabled',false);
+		$("#debugstepbutton").attr('disabled',false);
+		
+		KeyboardUnhook();
+		vic20.vic.initCanvas();
+	
+		isDebugging = true;
+		vic20.stopExecution();
+		vic20.stepToInstruction();
+		
+		
+		$("#debugContent_cpu").html(vic20.cpu.debugInformation());
+		
+		var html = "<table><tr><td style='vertical-align:top;'>";
+		//html+="<b>Memory Tagging</b> <a href='#' onclick=\"$('#memoryTaggingHelp').dialog()\">?</a><br/>";
+		//html+="Set:   <input type='text' name='tagColour' value='1'/><br/>";
+		//html+="Clear: <input type='text' name='tagColour'/><br/>";
+		
+		//html+="<br/>";
+		
+		html+="<div style='margin-bottom:4px;height:400px;overflow:scroll;border:1px solid black;' id='disassemblyWindow'>";
+		html+="<table id='debug2'>";
+		html+="<tr><th>BP</th><th>PC</th><th>Instruction</th><th>Branch</th><th>Bytes</th></tr>";
+
+		var regs = vic20.cpu.getRegisters();
+		var matchColour = 1*$("#colour").val();
+		//var pc = regs.pc;
+		for(var pc=0; pc<65536;) {
+			//if (memColour[pc]!=matchColour) {pc++;continue;}
+			// read
+			if (memExec[pc]==8 || memExec[pc]==16) {
+				html += "<tr><td></td><td>"+toHex4(pc)+"</td><td colspan='3'>";
+				for(var npc=0; npc<8; npc++) {
+					html += toHex2(mem[pc++]) + " ";
+					if (memExec[pc]!=8 && memExec[pc]!=16) break;
+				}
+				html += "</td><tr>";
+			}
+			else if (memExec[pc]==16) {
+				pc++; // written data
+			} else if (memExec[pc]&2) {
+				var r = disassemble(pc,mem);
+				if (regs.pc==pc) {
+					html += "<tr style='background-color:gray;' id='currentPC'>";
+				}
+				else if (memExec[pc]&4) {
+					html += "<tr style='background-color:#ECCEF5;'>";
+				}
+				else {
+					html += "<tr>";
+				}
+				
+				html += "<td onclick='toggleBreakpoint("+pc+")' id='bp"+pc+"'>"+((memBp[pc]==0)?" ":"B")+"</td>";
+				html+= "<td>"+toHex4(pc)+"</td>";
+				html+= "<td>"+r.result+"</td>";
+				html+= "<td>";
+				if (r.branch!=-1) html += toHex4(r.branch);
+				html+="</td><td>";
+				for(var j=0; j<r.bytes.length; j++) {
+					html+=toHex2(r.bytes[j])+" ";
+				}
+				html+="</td></tr>";
+				
+				pc += r.bytes.length;
+			} else {
+				pc++;
+			}
+		}
+		
+		html += "</table>";
+		html += "</div>";
+		html += "<span style='background-color:#ECCEF5;padding-left:20px;border:1px solid gray;'>&#160;</span> = Executed during interrupt<br/>";
+		
+		$("#debugContent_disassembly").html(html);
+		$("#debugContent_via1").html(vic20.via1.debugInformation());
+		$("#debugContent_via2").html(vic20.via2.debugInformation());
+		$("#debugContent_vic").html(vic20.vic.debugInformation());
+		
+		//$("#debugContent").html(html).css("font-size","11px");
+		var rowPos = $("#currentPC").position();
+		if (rowPos) {
+			var dw = $("#disassemblyWindow");
+			dw.scrollTop(rowPos.top-dw.offset().top-dw.height()/2);
+		}
+		
+		if ($("#rad1").attr("checked")) {
+			memoryToAsciiBasic2(mem);
+		}
+	}
+	
+	function step() {		
+		vic20.cycle();
+		debug();
+	}
+	
+	function run() {
+		isDebugging = false;
+		KeyboardHook();
+		vic20.execute();
+		$("#debugpausebutton").attr('disabled',false);
+		$("#debugrunbutton").attr('disabled',true);
+		$("#debugstepbutton").attr('disabled',true);
+	}
+	
+	function toggleBreakpoint(address) {
+		var el = $("#bp"+address);
+		if (memBp[address]==0) {
+			memBp[address]=1;
+			el.html("B");
+		}
+		else {
+			memBp[address]=0;
+			el.html(" ");
+		}
+	}
+	
+	function trace() {
+		vic20.cpu.traceStart(100);
+		setTimeout("trace2()",100);
+	}
+	
+	function trace2() {
+		if (!vic20.cpu.traceComplete()) {
+			setTimeout("trace2()",100);
+		} else {
+			var data = vic20.cpu.traceData();
+			var html = "<table>";
+			html+="<tr><th>PC</th><th>Instruction</th><th>Branch</th></tr>";
+			for(var i=0; i<data.length; i++) {
+				var r = data[i];
+				html += "<tr>";
+				
+				html+= "<td>"+r.pc.toString(16).toUpperCase()+"</td>";
+				html+= "<td>"+r.result+"</td>";
+				html+= "<td>";
+				if (r.branch!=-1) html += r.branch.toString(16).toUpperCase();
+				html+="</td>";
+				html += "</tr>";
+			}
+			html += "</table>";
+			
+			$debugDialog.html(html).css("font-size","11px").dialog('open');
+		}
+	}
+	
+	function fullscreen(noWarningForNotSupported) {
+		var isFullScreen = document.mozFullScreen || document.webkitIsFullScreen;
+		if (!isFullScreen) {
+			var elem = document.getElementById("canvasfs");
+			var canvasElem = document.getElementById("canvas");
+			
+			if (!$(elem).is(":visible")) {
+				alert("You cannot go fullscreen in debug mode");
+				return;
+			}
+			if (elem.requestFullScreen) {  
+				elem.requestFullScreen();  
+			} else if (elem.mozRequestFullScreen) {  
+				elem.mozRequestFullScreen();
+				elem.style.height="100%";
+				canvasElem.style.height="100%";
+			} else if (elem.webkitRequestFullScreen) {  
+				elem.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);  
+				elem.style.height="100%";
+				elem.style.width="100%";
+				canvasElem.style.height="100%";
+			} else {
+				if (!(noWarningForNotSupported==true)) alert("Fullscreen not supported. Try Firefox or Chrome.");
+			}
+		} else {
+			var elem = document.getElementById("canvas");  
+			if (document.cancelFullScreen) {  
+				document.cancelFullScreen();
+			} else if (document.mozCancelFullScreen) {  
+				document.mozCancelFullScreen();
+				elem.style.height="";
+			} else if (document.webkitCancelFullScreen) {  
+				document.webkitCancelFullScreen();  
+				elem.style.height="";
+			}
+		}
+	}
+	</script>
+
+	<div id="canvasfs" style="height: 100%; width: 100%; background-color: rgb(0, 0, 0);">
+		
+	</div>
+
+    <canvas id="canvas" width="334" height="254" style="display: block; margin-left: auto; margin-right: auto; height: 480px; width: 512px;" onclick="fullscreen(true)">&nbsp;</canvas>
+
+	<div style="padding:16px 16px;width:1200px">
+
+		<div id="modePlayground">
+			<table style="margin-left: auto;margin-right: auto;" border="0" cellpadding="0" cellspacing="0">
+			<tbody><tr style="overflow: hidden; height: 26px;">
+				<td colspan="3" style="overflow: hidden; height: 26px; background-image: url(vic20/monitor_top_s.jpg);background-size:100%;background-repeat:no-repeat;background-position:bottom;"></td>
+			</tr>
+			<tr style="background-color: black;">
+				<td style="overflow: hidden; background-image: url(vic20/monitor_left.jpg);"><img src="./vic20.php_files/monitor_left.jpg" border="0"></td>
+				<td>
+					<div id="xcanvasfs" style="height: 100%; width: 100%; background-color: rgb(0, 0, 0);">
+						<canvas id="canvas" width="334" height="254" style="display: block; margin-left: auto; margin-right: auto; height: 100%;" onclick="fullscreen(true)">&nbsp;</canvas>
+					</div>
+				</td>
+				<td style="overflow: hidden; background-image: url(vic20/monitor_right.jpg);"><img src="./vic20.php_files/monitor_right.jpg" border="0"></td>
+			</tr>
+			<tr style="overflow: hidden; height: 82px;">
+				<td colspan="3" style="overflow: hidden;background-image: url(vic20/monitor_bottom.jpg);background-size:100%;background-repeat:no-repeat;"></td>
+			</tr>
+			</tbody></table>
+			<br>
+
+			<div style="text-align:center;white-space:nowrap;">
+				<img id="datasettesmall" src="./vic20.php_files/datasette.png" onclick="datasetteMouseClick()"><img src="./vic20.php_files/vic20.jpg" style="padding:30px 0px 30px 0px;border:1px solid white;" border="0"><img src="./vic20.php_files/joystick.jpg" style="padding:30px 0px 30px 0px;border:1px solid white;">
+			</div>
+			
+			<div style="position:relative;left:868px;top:-70px;font-family: Verdana;font-size: 12px;">
+				<input type="checkbox" id="joykeysopt2" onclick="{Config.joykeys=!Config.joykeys;updateMenuState();}">&nbsp;<label for="joykeysopt2">Joy Keys</label>&nbsp;<a href="javascript:" onclick="$(&#39;#joykeysHelp&#39;).dialog()">?</a>
+			</div>
+		</div>
+	
+		<div id="modeCodify">
+			Codify
+		</div>
+		
+		<div id="modeDebug">
+			<!-- button onclick="vic20.cpu.incColour()">inc colour</button>
+			<input type="text" id="colour" value="2"/-->
+			<div style="display:inline-block;vertical-align:top">
+				<b>Display</b><br>			
+				<canvas id="canvasDebug" width="111" height="111" style="display:inline-block;border:1px solid black;">&nbsp;</canvas><br>
+				<div style="vertical-align:top">
+					<div id="debugContent_cpu">&nbsp;</div><br>
+					<b>Control</b><br>
+					<button onclick="step()" disabled="disabled" id="debugpausebutton">PAUSE</button>
+					<button onclick="step()" id="debugstepbutton">STEP</button>
+					<button onclick="run()" id="debugrunbutton">RUN</button><br>
+				</div><br>
+			</div>
+			<div class="tabGroup" style="height:450px;width:800px;display:inline-block;vertical-align:top">
+				<input type="radio" name="tabGroup1" id="rad1" class="tab1">
+				<label for="rad1" onclick="memoryToAsciiBasic2(mem);">Basic Program</label>
+				
+				<input type="radio" name="tabGroup1" id="rad2" class="tab2" checked="checked">
+				<label for="rad2">Disassembly</label>
+				
+				<input type="radio" name="tabGroup1" id="rad3" class="tab3">
+				<label for="rad3">Memory</label>
+				
+				<input type="radio" name="tabGroup1" id="rad4" class="tab4">
+				<label for="rad4">VIC</label>
+			 
+				<input type="radio" name="tabGroup1" id="rad5" class="tab5">
+				<label for="rad5">VIAs</label>
+		
+				<div class="tab1" id="debugContent_basicprogram"><!-- textarea id="debugContent_basicprogram" style="width:800px;height:290px">&#160;</textarea-->
+					<canvas id="debugContent_basicprogram_canvas" width="1280" height="480" style="border:1px solid black">&nbsp;</canvas>
+				</div>
+				<div id="debugContent_disassembly" class="tab2">&nbsp;</div>
+				<div id="debugContent_memory" class="tab3">&nbsp;</div>
+				<div id="debugContent_vic" class="tab4">&nbsp;</div>
+				<div class="tab5">
+					<div id="debugContent_via2" style="display:inline-block;">&nbsp;</div>
+					<div id="debugContent_via1" style="display:inline-block;">&nbsp;</div>
+				</div>
+			</div>
+
+		</div>
+		
+	</div>
+<br>
+<br>
+ FrameTime: <span id="frameTime">12.28 ms</span>
+
+
+
+
+
+<div id="tapeZoom" style="display:none;">
+	<img id="datasette_empty" src="./vic20.php_files/datasette_empty.png" usemap="#datasettemap">
+	<img id="datasette_stopped" src="./vic20.php_files/datasette_stopped.png" usemap="#datasettemap">
+	<img id="datasette_play" src="./vic20.php_files/datasette_play.png" usemap="#datasettemap">
+	
+	<map id="datasettemap" name="datasettemap">
+		<area shape="rect" alt="stop" title="Stop" coords="166,303,198,366" href="javascript:stopTape()">
+		<area shape="rect" alt="insert" title="Insert" coords="29,111,225,236" href="javascript:loadTapeCustom()">
+		<area shape="rect" alt="play" title="Play" coords="130,303,165,367" href="javascript:playTape()">
+		<!-- area shape="rect" alt="ffwd" title="Fast Forward" coords="98,304,130,363" href=""  / -->
+		<!-- area shape="rect" alt="rwnd" title="Rewind" coords="65,305,97,365" href=""  / -->
+		<!-- area shape="rect" alt="reset" title="Reset Counter" coords="107,74,129,96" href=""  / -->
+		<!-- area shape="rect" alt="counter" title="View Counter" coords="74,73,104,93" href=""  / -->
+		<!-- area shape="rect" alt="record" title="Record" coords="29,304,63,364" href=""  / -->
+	</map>
+</div>
+
+<script>
+vic20 = new Vic20();
+var machineType = getURLParameter("machineType");
+if (machineType=="pal") {vic20.isPal=true;kerneldata=kerneldataPal;machineType="pal";}
+
+/*if (machineType=="ntsc") */ else {vic20.isPal=false;kerneldata=kerneldataNtsc;}
+
+
+vic20.init();
+vic20.execute();
+
+var url = getURLParameter("load");
+var urlmem = getURLParameter("mem");
+if (url && url!="" && url!=null && url!="null") {
+	if (url.indexOf(".csm")!=-1 || url.indexOf(".tap")!=-1) {
+		externalLoad("loadTape",url)
+	} else {
+		externalLoad("loadPrg",url);
+	}
+}
+
+function externalLoad(cmd,url,format, subfile) {
+	$("#selectZipFile").dialog("close");
+	console.debug("externalLoad cmd="+cmd+" url="+url+" format="+format+" subfile="+subfile);
+	fullscreen(true);
+	if (format) {
+		if(format=="pal") {
+			vic20.isPal=true;kerneldata=kerneldataPal;
+		}
+		if(format=="ntsc") {
+			vic20.isPal=false;kerneldata=kerneldataNtsc;
+		}
+	}
+	var head= document.getElementsByTagName('head')[0];
+	var script= document.createElement('script');
+	script.type= 'text/javascript';
+	// TODO encode
+	script.src= 'vic20/prgtojsloader.php?cmd='+cmd+'&prgurl='+url+'&subfile='+subfile;
+	head.appendChild(script);
+}
+
+function loadTapeCustom(tapeUrl) {
+	if (!tapeUrl) tapeUrl = window.prompt("Enter the URL to the tape including http://\nSupported formats are csm,tap,csm.gz, and tap.gz");
+	if (tapeUrl) {
+		externalLoad("loadTape",tapeUrl);
+	}
+}
+
+function loadTape(binhex) {
+	EventManager.event(EventTape.createInsertEvent(binToArray(binhex[0])));
+	Config.memoryAt0400 = Config.memoryAt2000 = Config.memoryAt4000 = Config.memoryAt6000 = Config.memoryAtA000 = false;
+	if (urlmem=="3k") Config.memoryAt0400 = true;
+	if (urlmem=="24k") Config.memoryAt2000 = Config.memoryAt4000 = Config.memoryAt6000 = Config.memoryAtA000 = true;
+	vic20.updateMemoryModules();
+	vic20.reset();
+	loadPrgSrc="tape";
+}
+
+function loadCartCustom() {
+	var cartUrl = window.prompt("Enter the URL to the cart including the http://");
+	if (cartUrl) {
+		externalLoad("loadPrg",cartUrl);
+	}
+}
+
+function loadPrgCustom() {
+	var cartUrl = window.prompt("Enter the URL to the prg including the http://");
+	if (cartUrl) {
+		externalLoad("loadPrg",cartUrl);
+	}
+}
+
+function chooseZipFile(options) {
+	validOptions = new Array();
+	for(var i=0; i<options.length; i++) {
+		if (options[i].indexOf(".prg")!=-1) {
+			$("#selectZipFiles").append($('<a>'+options[i]+'</a>').attr('href',"javascript:externalLoad(\'loadPrg\',\'"+url+"\',\'"+machineType+"\',\'"+options[i]+"\');")).append("<br/>");
+			validOptions.push(options[i]);
+		}
+	}
+	if (validOptions.length==0) {
+		alert("Sorry, no .prg files found in zip");
+	}
+	else if (validOptions.length==1) {
+		externalLoad('loadPrg',url,machineType,validOptions[0]);
+	}
+	else {
+		$("#selectZipFile").dialog();
+	}
+}
+</script>
+
+<div id="selectZipFile" style="display:none">
+	Select a file from the zip to open:
+	<div id="selectZipFiles">
+	</div>
+</div>
+
+<script>
+function updateMenuState() {
+	$("#joykeysopt").prop("checked", Config.joykeys);
+	$("#joykeysopt2").prop("checked", Config.joykeys);
+
+	$("#mem0400opt").prop("checked", Config.memoryAt0400);
+	$("#mem2000opt").prop("checked", Config.memoryAt2000);
+	$("#mem4000opt").prop("checked", Config.memoryAt4000);
+	$("#mem6000opt").prop("checked", Config.memoryAt6000);
+	$("#memA000opt").prop("checked", Config.memoryAtA000);
+	
+	$("#speedopt100").prop("checked", Config.speed==1);
+	$("#speedoptNoLimit").prop("checked", Config.speed!=1);
+	
+	$("#ntscUsaOpt").prop("checked",   kerneldata==kerneldataNtsc && chardata==chardataEnglish);
+	$("#ntscJapanOpt").prop("checked", kerneldata==kerneldataNtsc && chardata==chardataJapan);
+	$("#palWorldOpt").prop("checked",  kerneldata==kerneldataPal && chardata==chardataEnglish);
+	$("#palSweFiOpt").prop("checked",  kerneldata==kerneldataPal && chardata==chardataSwedenFinland);
+}
+
+updateMenuState();
+
+function playTape() {
+	Config.tapePlay=true;
+	updateDatasetteView();	
+}
+
+function stopTape() {
+	Config.tapePlay=false;
+	updateDatasetteView();	
+}
+
+function datasetteMouseClick() {
+	$('#tapeZoom').dialog({width:300,height:440,position:{my:"left",at:"left",of:$("#datasettesmall")}});
+	updateDatasetteView();
+}
+
+function updateDatasetteView(event) {
+	if (event && event.filepath) {
+		datasetteMouseClick();
+	}
+	$("#datasette_empty,#datasette_stopped,#datasette_play").hide();
+	if (Config.tapePlay) {
+		$("#datasette_play").show();
+		$("#datasette_empty,#datasette_stopped").hide();
+	} else if (vic20.tapedrive.isTapeLoaded()) {
+		$("#datasette_stopped").show();
+		$("#datasette_empty,#datasette_play").hide();
+	} else {
+		$("#datasette_empty").show();
+		$("#datasette_stopped,#datasette_play").hide();
+	}
+}
+
+EventManager.listen("EventTape", updateDatasetteView);
+
+function pasteBasicProgram() {
+	KeyboardUnhook();
+	$("#basicDialog").dialog({
+			title: 'Basic Listing',
+			width: 700,
+			height: 300,
+			close: function(event, ui) { KeyboardHook(); loadPrgFromBasicString($("#pasteBasic").val()); return true; }
+	});
+	$("#pasteBasic").val(memoryToAsciiBasic(mem));
+}
+
+var assembler = new Cpu6502assembler();
+
+function pasteAssemblerProgram() {
+	KeyboardUnhook();
+	$("#assemblerDialog").dialog({
+			title: 'Assembler Listing',
+			width: 'auto',
+			close: function(event, ui) {
+				KeyboardHook();
+				return true;
+			}
+	});
+}
+
+function compile() {
+	var result = assembler.compile($("#pasteAssembler").val());
+	var fb = "";
+	for(var i=0; i<result.feedback.length; i++) {
+		fb += result.feedback[i].message + "\n";
+	}
+	$("#assemblerFeedback").val(fb);
+	if (result.success) {
+		for(var i=0; i<65536; i++) {
+			if (result.m[i]!==undefined) {
+				mem[i] = result.m[i];
+				memExec[i] = 2;
+			}
+		}
+	}
+}
+</script>
+
+<div id="basicDialog" style="display:none">
+	<p>Paste/Type your program then close this dialog:</p><p>
+	<textarea id="pasteBasic" style="width:100%;height:100%;">&nbsp;</textarea>
+</p></div>
+
+<div id="assemblerDialog" style="display:none">
+	Paste/Type your assembler here:<br>
+	<textarea id="pasteAssembler" style="width:600px;height:300px;"></textarea><br>
+	<button onclick="compile()">Compile</button>(automatically copies to memory on success)<br>
+	Compiler Output:<br>
+	<textarea id="assemblerFeedback" style="width:600px;height:100px;"></textarea>
+</div>
+	
+
+
+
+
+
+</body></html>
