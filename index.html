@@ -36,14 +36,28 @@
 <style>
 .vickey
 {
-   width: 70px; 
-   height: 110px;
-   margin: 15px;
-   font-size: 25px;
-   font-weight: bolder; 
+   width: 80px; 
+   height: 130px;
+   margin: 10px;
+   font-size: 75px;
+   font-weight: bold; 
+   font-family: monospace;
    color: white; 
-   background: gray; 	
+   background: #666; 
+   border: 0px solid;	
 }	
+.halfspace
+{
+   width: 00px; 
+   height: 130px;
+   margin: 30px;
+   font-size: 75px;
+   font-weight: bold; 
+   font-family: monospace;
+   color: white; 
+   background: none; 
+   border: 0px solid;		
+}
 </style>	
 	
 
@@ -56,7 +70,18 @@
 <button class="vickey" onclick="sendkey(85)">U</button>
 <button class="vickey" onclick="sendkey(73)">I</button>
 <button class="vickey" onclick="sendkey(79)">O</button>
-<button class="vickey" onclick="sendkey(80)">P</button>
+<button class="vickey" onclick="sendkey(80)">P</button><br>
+<span class="halfspace"></span>
+<button class="vickey" onclick="sendkey(65)">A</button>
+<button class="vickey" onclick="sendkey(83)">S</button>
+<button class="vickey" onclick="sendkey(68)">D</button>
+<button class="vickey" onclick="sendkey(70)">F</button>
+<button class="vickey" onclick="sendkey(71)">G</button>
+<button class="vickey" onclick="sendkey(72)">H</button>
+<button class="vickey" onclick="sendkey(74)">J</button>
+<button class="vickey" onclick="sendkey(75)">K</button>
+<button class="vickey" onclick="sendkey(76)">L</button>
+
 
 <script>
 function sendkey(key)
